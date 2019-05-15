@@ -137,4 +137,12 @@ class Slitherin(gym.Env):
         the positions of the ith snake. The last array will have the poistions
         all the food.
         """
-        pass
+        state = np.zeros((self.number_of_snakes + 1, self.world_size, self.world_size)dtype=np.float32)
+        for i in range(self.number_of_snakes):
+            for loc in self.positions:
+                state[i][loc[0]][loc[1]] = 1.0
+
+        for food in self.food:
+            state[-1][food[0]][food[1]] = 1.0
+
+        return state
