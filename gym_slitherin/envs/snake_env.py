@@ -6,11 +6,11 @@ import pygame
 import operator
 import numpy as np
 
-class Slitherin(gym.Env):
+class Snake(gym.Env):
     metadata = {'render.modes': ['human']}
     def __init__(self):
-        self.number_of_snakes = 15
-        self.number_of_food = 100
+        self.number_of_snakes = 1
+        self.number_of_food = 1
         self.world_size = 100
         self.first = True
         self.move_tuple = [(0,1), (0,-1), (1,0), (-1,0)]
@@ -47,9 +47,10 @@ class Slitherin(gym.Env):
             self.alive.remove(i)
             self.positions[i] = []
 
-
+        reward = 0
         for i in self.alive:
             if self.eat(self.positions[i][-1]):
+                reward += 1
                 self.length[i] += 1
                 self.food.remove(self.positions[i][-1])
 
@@ -57,12 +58,8 @@ class Slitherin(gym.Env):
             self.place_food()
 
         done = False
-        if len(self.alive) <= 1:
+        if len(self.alive) == 0:
             done = True
-
-        reward = 0
-        if done and 0 in self.alive:
-            reward = 1
 
         return self.get_state(), reward, done, 0
 
