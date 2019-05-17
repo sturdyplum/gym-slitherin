@@ -67,7 +67,7 @@ class Snake(gym.Env):
         self.reset_initial_positions()
         self.food = set()
         for _ in range(self.number_of_food):
-            self.place_food
+            self.place_food()
         self.alive = set(range(self.number_of_snakes))
         self.length = [1 for _ in range(self.number_of_snakes)]
         self.world = np.zeros((self.world_size, self.world_size), dtype=np.int)
