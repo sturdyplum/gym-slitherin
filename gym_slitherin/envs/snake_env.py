@@ -1,6 +1,7 @@
 import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
+from gym import spaces
 import random
 import pygame
 import operator
@@ -11,12 +12,12 @@ class Snake(gym.Env):
     def __init__(self):
         self.number_of_snakes = 1
         self.number_of_food = 1
-        self.world_size = 100
+        self.world_size = 10
         self.first = True
         self.move_tuple = [(0,1), (0,-1), (1,0), (-1,0)]
+        self.observation_space = spaces.Box(low=-0.0, high=1.0, shape=(self.number_of_snakes + 1, self.world_size, self.world_size), dtype=np.float32)
+        self.action_space = spaces.Discrete(4)
         self.reset()
-        # self.observations_shape
-        # self.input_size
 
     def dead(self, location):
         return not self.valid_range(location) or self.world[location[0], location[1]] > 1
@@ -26,10 +27,9 @@ class Snake(gym.Env):
 
     # actions here should be a list of actions for every single agent
     def step(self, action):
-        assert(len(action) == self.number_of_snakes)
         for i in self.alive:
-            assert(action[i] >= 0 and action[i] <= 3)
-            self.positions[i].append(tuple(map(operator.add, self.positions[i][-1], self.move_tuple[action[i]])))
+            assert(action >= 0 and action <= 3)
+            self.positions[i].append(tuple(map(operator.add, self.positions[i][-1], self.move_tuple[action])))
             if self.valid_range(self.positions[i][-1]):
                 self.world[self.positions[i][-1][0]][self.positions[i][-1][1]] += 1
             if self.length[i] < len(self.positions[i]):
@@ -71,6 +71,7 @@ class Snake(gym.Env):
         self.alive = set(range(self.number_of_snakes))
         self.length = [1 for _ in range(self.number_of_snakes)]
         self.world = np.zeros((self.world_size, self.world_size), dtype=np.int)
+        return self.get_state()
 
     def reset_initial_positions(self):
         """

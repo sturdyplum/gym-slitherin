@@ -15,8 +15,8 @@ class Slitherin(gym.Env):
         self.first = True
         self.move_tuple = [(0,1), (0,-1), (1,0), (-1,0)]
         self.reset()
-        # self.observations_shape
-        # self.input_size
+        # self.observation_space = ()
+        # self.action_space
 
     def dead(self, location):
         return not self.valid_range(location) or self.world[location[0], location[1]] > 1
