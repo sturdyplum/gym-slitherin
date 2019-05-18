@@ -14,9 +14,9 @@ class Snake(gym.Env):
         self.number_of_food = 1
         self.world_size = 10
         self.first = True
-        self.move_tuple = [(0,1), (0,-1), (1,0), (-1,0)]
+        self.move_tuple = [(0,1), (-1,1), (0,-1), (1,0)]
         self.observation_space = spaces.Box(low=-0.0, high=1.0, shape=(self.number_of_snakes + 1, self.world_size, self.world_size), dtype=np.float32)
-        self.action_space = spaces.Discrete(4)
+        self.action_space = spaces.Discrete(3)
         self.reset()
 
     def dead(self, location):
@@ -28,7 +28,14 @@ class Snake(gym.Env):
     # actions here should be a list of actions for every single agent
     def step(self, action):
         for i in self.alive:
-            assert(action >= 0 and action <= 3)
+            assert(action >= 0 and action <= 2)
+            if action == 1:
+                self.direction +=1
+            elif action == 2:
+                self.direction -= 1
+            self.direction += 4
+            self.direction %= 4
+
             self.positions[i].append(tuple(map(operator.add, self.positions[i][-1], self.move_tuple[action])))
             if self.valid_range(self.positions[i][-1]):
                 self.world[self.positions[i][-1][0]][self.positions[i][-1][1]] += 1
@@ -71,6 +78,8 @@ class Snake(gym.Env):
         self.alive = set(range(self.number_of_snakes))
         self.length = [1 for _ in range(self.number_of_snakes)]
         self.world = np.zeros((self.world_size, self.world_size), dtype=np.int)
+        self.direction = 0
+
         return self.get_state()
 
     def reset_initial_positions(self):
