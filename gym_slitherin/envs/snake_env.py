@@ -12,9 +12,9 @@ class Snake(gym.Env):
     def __init__(self):
         self.number_of_snakes = 1
         self.number_of_food = 1
-        self.world_size = 10
+        self.world_size = 100
         self.first = True
-        self.move_tuple = [(0,1), (-1,1), (0,-1), (1,0)]
+        self.move_tuple = [(0,1), (-1,0), (0,-1), (1,0)]
         self.observation_space = spaces.Box(low=-0.0, high=1.0, shape=(self.number_of_snakes + 1, self.world_size, self.world_size), dtype=np.float32)
         self.action_space = spaces.Discrete(3)
         self.reset()
@@ -36,7 +36,7 @@ class Snake(gym.Env):
             self.direction += 4
             self.direction %= 4
 
-            self.positions[i].append(tuple(map(operator.add, self.positions[i][-1], self.move_tuple[action])))
+            self.positions[i].append(tuple(map(operator.add, self.positions[i][-1], self.move_tuple[self.direction])))
             if self.valid_range(self.positions[i][-1]):
                 self.world[self.positions[i][-1][0]][self.positions[i][-1][1]] += 1
             if self.length[i] < len(self.positions[i]):
@@ -71,14 +71,14 @@ class Snake(gym.Env):
         return self.get_state(), reward, done, 0
 
     def reset(self):
-        self.reset_initial_positions()
+        self.world = np.zeros((self.world_size, self.world_size), dtype=np.int)
         self.food = set()
-        for _ in range(self.number_of_food):
-            self.place_food()
         self.alive = set(range(self.number_of_snakes))
         self.length = [1 for _ in range(self.number_of_snakes)]
-        self.world = np.zeros((self.world_size, self.world_size), dtype=np.int)
         self.direction = 0
+        for _ in range(self.number_of_food):
+            self.place_food()
+        self.reset_initial_positions()
 
         return self.get_state()
 
